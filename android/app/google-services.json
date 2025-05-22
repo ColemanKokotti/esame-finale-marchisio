@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "90348594257",
+    "project_id": "esame-finale-marchisio",
+    "storage_bucket": "esame-finale-marchisio.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:90348594257:android:af15da52f9b76029ba0470",
+        "android_client_info": {
+          "package_name": "com.example.esame_finale_marchisio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoThYpO3sueGMdKB_i3F5PLqmDUqn1U_0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
