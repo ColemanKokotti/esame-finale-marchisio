@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../controller/login_controller.dart';
+import '../bloc/auth/auth_bloc.dart';
+import '../bloc/auth/auth_event.dart';
 import '../widget/custom_top_bar.dart';
 import '../widget/notification_card.dart';
 import '../screens/notification_screen.dart';
@@ -16,15 +17,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final List<Map<String, String>> notifications = List.generate(5, (index) {
     return {
-      'sender': 'Risorsa ${index + 1}',
-      'message': [
-        'Consulta la guida rapida per i pulsanti personalizzati.',
-        'Scopri come configurare i bottoni dinamici nei tuoi progetti.',
-        'Leggi l’articolo sulle best practices per UI responsive.',
-        'Nuovo aggiornamento: supporto per gesture avanzate!',
-        'Aggiunta documentazione sulle animazioni nei custom button.'
-      ][index],
-    };
+    'sender': 'Risorsa ${index + 1}',
+    'message': [
+    'Consulta la guida rapida per i pulsanti personalizzati.',
+    'Scopri come configurare i bottoni dinamici nei tuoi progetti.',
+    'Leggi l articolo sulle best practices per UI responsive.',
+    'Nuovo aggiornamento: supporto per gesture avanzate!',
+    'Aggiunta documentazione sulle animazioni nei custom button.'
+    ][index],
+  };
   });
 
   void _openUrl(String url) async {
@@ -36,15 +37,55 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _handleLogout() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Conferma Logout'),
+          content: const Text('Sei sicuro di voler uscire?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Annulla'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.read<AuthBloc>().add(AuthSignOutRequested());
+              },
+              child: const Text(
+                'Esci',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildResourceButton({required IconData icon, required String text, required VoidCallback onPressed}) {
     return ElevatedButton(
       onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFE0F2E9),
+        foregroundColor: Colors.black,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.all(16),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 40),
+          Icon(icon, size: 40, color: const Color(0xFF009E3D)),
           const SizedBox(height: 8),
-          Text(text, textAlign: TextAlign.center),
+          Text(
+            text,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
         ],
       ),
     );
@@ -52,12 +93,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loginController = Provider.of<LoginController>(context, listen: false);
-
     return Scaffold(
       appBar: CustomTopBar(
         showActions: true,
-        onLogout: () => loginController.logout(context),
+        onLogout: _handleLogout,
         onNotification: () {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const NotificationsScreen()),
@@ -66,6 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
+          // Sezione notifiche scorrevoli
           SizedBox(
             height: 120,
             child: PageView.builder(
@@ -83,6 +123,8 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           ),
+
+          // Sezione risorse
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),

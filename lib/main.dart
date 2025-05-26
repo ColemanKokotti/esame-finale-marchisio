@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'controller/bottom_nav_controller.dart';
-import 'controller/login_controller.dart';
-import 'screens/login_screen.dart';
+import 'repositories/auth_repository.dart';
+import 'bloc/auth/auth_bloc.dart';
+import 'bloc/auth/auth_event.dart';
+import 'screens/auth_wrapper.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MyApp());
 }
 
@@ -16,11 +27,18 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => BottomNavController()),
-        ChangeNotifierProvider(create: (_) => LoginController()),
+        RepositoryProvider<AuthRepository>(
+          create: (context) => AuthRepository(),
+        ),
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(
+            authRepository: context.read<AuthRepository>(),
+          )..add(AuthInitializeRequested()),
+        ),
       ],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: LoginScreen(),
+        home: AuthWrapper(),
       ),
     );
   }

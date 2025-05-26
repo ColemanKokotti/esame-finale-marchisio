@@ -1,18 +1,132 @@
 import 'package:flutter/material.dart';
-import '../screens/login_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/auth/auth_bloc.dart';
+import '../bloc/auth/auth_event.dart';
+import '../screens/notification_screen.dart';
 
-class CustomTopBarController {
-  void handleLogout(BuildContext context) {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-          (route) => false,
+class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
+  final bool showActions;
+  final VoidCallback? onLogout;
+  final VoidCallback? onNotification;
+
+  const CustomTopBar({
+    super.key,
+    this.showActions = false,
+    this.onLogout,
+    this.onNotification,
+  });
+
+  void _handleLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Conferma Logout'),
+          content: const Text('Sei sicuro di voler uscire?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Annulla'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                // Usa il context originale per il BLoC
+                context.read<AuthBloc>().add(AuthSignOutRequested());
+                // Chiama il callback se fornito
+                onLogout?.call();
+              },
+              child: const Text(
+                'Esci',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  void handleNotification(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Notifiche in arrivo...')),
+  void _handleNotification(BuildContext context) {
+    if (onNotification != null) {
+      onNotification!();
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      automaticallyImplyLeading: false,
+      backgroundColor: const Color(0xFF009E3D),
+      elevation: 2,
+      shadowColor: Colors.black26,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Spazio a sinistra per bilanciare
+          if (showActions)
+            const SizedBox(width: 48)
+          else
+            const SizedBox(width: 24),
+
+          // Logo centrale
+          ColorFiltered(
+            colorFilter: const ColorFilter.mode(
+              Colors.white,
+              BlendMode.srcIn,
+            ),
+            child: Image.asset(
+              'assets/icons/logo.png',
+              width: 40,
+              height: 40,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(
+                  Icons.home,
+                  color: Colors.white,
+                  size: 40,
+                );
+              },
+            ),
+          ),
+
+          // Azioni a destra
+          if (showActions)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Bottone notifiche
+                IconButton(
+                  onPressed: () => _handleNotification(context),
+                  icon: const Icon(
+                    Icons.notifications,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  tooltip: 'Notifiche',
+                ),
+                // Bottone logout
+                IconButton(
+                  onPressed: () => _handleLogout(context),
+                  icon: const Icon(
+                    Icons.logout,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  tooltip: 'Logout',
+                ),
+              ],
+            )
+          else
+            const SizedBox(width: 24),
+        ],
+      ),
     );
   }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
