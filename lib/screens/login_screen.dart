@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/auth/auth_bloc.dart';
 import '../bloc/auth/auth_state.dart';
 import '../bloc/auth/auth_event.dart';
-import '../widget/email.dart';
-import '../widget/password.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

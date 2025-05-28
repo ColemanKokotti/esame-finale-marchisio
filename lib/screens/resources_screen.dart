@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../widget/custom_top_bar.dart';
+import 'staff_screen.dart';
 
 class ResourcesScreen extends StatelessWidget {
   const ResourcesScreen({super.key});
@@ -10,14 +11,20 @@ class ResourcesScreen extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      debugPrint('Impossibile aprire il link: \$url');
+      debugPrint('Impossibile aprire il link: $url');
     }
+  }
+
+  void _openStaffScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const StaffScreen()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomTopBar(),
+      appBar: const CustomTopBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: GridView.count(
@@ -65,9 +72,7 @@ class ResourcesScreen extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                // No URL defined for Staff
-              },
+              onPressed: () => _openStaffScreen(context),
               child: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
