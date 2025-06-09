@@ -368,34 +368,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.grey.shade50,
               ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.badge, color: Colors.grey.shade600),
                   const SizedBox(width: 8),
                   Text(
                     'Ruolo: $selectedRole',
                     style: const TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Data registrazione
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.grey.shade50,
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.calendar_today, color: Colors.grey.shade600),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Registrato il: ${_formatDate(currentUserProfile!.createdAt)}',
-                    style: const TextStyle(fontSize: 14),
                   ),
                 ],
               ),

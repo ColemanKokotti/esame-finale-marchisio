@@ -149,39 +149,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       );
                     },
                   ),
-
-                  const SizedBox(height: 16),
-
-                  // Informazioni credenziali predefinite
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: const Column(
-                      children: [
-                        Text(
-                          'Credenziali di prova:',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Email: prova@gmail.com',
-                          style: TextStyle(fontSize: 11, color: Colors.grey),
-                        ),
-                        Text(
-                          'Password: prova123',
-                          style: TextStyle(fontSize: 11, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
