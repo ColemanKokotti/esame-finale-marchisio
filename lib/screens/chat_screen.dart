@@ -60,18 +60,9 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.chat.title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            Text(
-              'Creata da ${widget.chat.creatorName}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
-            ),
-          ],
+        title: Text(
+          widget.chat.title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         backgroundColor: const Color(0xFF009E3D),
         foregroundColor: Colors.white,
@@ -140,34 +131,53 @@ class _ChatScreenState extends State<ChatScreen> {
 
         final messages = snapshot.data ?? [];
 
+        // Crea la lista di messaggi con il messaggio neutrale del creatore all'inizio
+        final displayMessages = <dynamic>[];
+
+        // Aggiungi il messaggio neutrale del creatore come primo elemento
+        displayMessages.add('creator_info');
+
+        // Aggiungi tutti i messaggi reali
+        displayMessages.addAll(messages);
+
         if (messages.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.chat_bubble_outline,
-                  size: 64,
-                  color: Colors.grey[400],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Nessun messaggio ancora',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey[600],
+          return Column(
+            children: [
+              // Messaggio neutrale del creatore
+              _buildCreatorInfoMessage(),
+
+              // Messaggio di chat vuota
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.chat_bubble_outline,
+                        size: 64,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Nessun messaggio ancora',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      if (_canSendMessages) ...[
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Inizia la conversazione scrivendo il primo messaggio',
+                          style: TextStyle(fontSize: 14),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                if (_canSendMessages) ...[
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Inizia la conversazione scrivendo il primo messaggio',
-                    style: TextStyle(fontSize: 14),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ],
-            ),
+              ),
+            ],
           );
         }
 
@@ -185,10 +195,39 @@ class _ChatScreenState extends State<ChatScreen> {
         return ListView.builder(
           controller: _scrollController,
           padding: const EdgeInsets.all(16),
-          itemCount: messages.length,
-          itemBuilder: (context, index) => _buildMessageTile(messages[index]),
+          itemCount: displayMessages.length,
+          itemBuilder: (context, index) {
+            if (displayMessages[index] == 'creator_info') {
+              return _buildCreatorInfoMessage();
+            } else {
+              return _buildMessageTile(displayMessages[index] as MessageModel);
+            }
+          },
         );
       },
+    );
+  }
+
+  Widget _buildCreatorInfoMessage() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Text(
+            'Chat creata da ${widget.chat.creatorName}',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey[700],
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+      ),
     );
   }
 

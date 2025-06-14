@@ -17,15 +17,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final List<Map<String, String>> notifications = List.generate(5, (index) {
     return {
-    'sender': 'Risorsa ${index + 1}',
-    'message': [
-    'Consulta la guida rapida per i pulsanti personalizzati.',
-    'Scopri come configurare i bottoni dinamici nei tuoi progetti.',
-    'Leggi l articolo sulle best practices per UI responsive.',
-    'Nuovo aggiornamento: supporto per gesture avanzate!',
-    'Aggiunta documentazione sulle animazioni nei custom button.'
-    ][index],
-  };
+      'sender': 'Risorsa ${index + 1}',
+      'message': [
+        'Consulta la guida rapida per i pulsanti personalizzati.',
+        'Scopri come configurare i bottoni dinamici nei tuoi progetti.',
+        'Leggi l articolo sulle best practices per UI responsive.',
+        'Nuovo aggiornamento: supporto per gesture avanzate!',
+        'Aggiunta documentazione sulle animazioni nei custom button.'
+      ][index],
+    };
   });
 
   void _openUrl(String url) async {
@@ -105,7 +105,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          // Sezione notifiche scorrevoli
           SizedBox(
             height: 120,
             child: PageView.builder(
@@ -124,7 +123,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // Sezione risorse
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),

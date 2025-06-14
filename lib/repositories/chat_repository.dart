@@ -1,4 +1,4 @@
-// repositories/chat_repository.dart
+// repositories/chat_repository.dart - Versione completa aggiornata
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/chat_model.dart';
 
@@ -18,6 +18,19 @@ class ChatRepository {
       return docRef.id;
     } catch (e) {
       throw Exception('Errore durante la creazione della chat: $e');
+    }
+  }
+
+  // METODO AGGIORNATO per creare chat da Map (per compatibilità con CreateChatScreen)
+  Future<String> createChatFromMap(Map<String, dynamic> chatData) async {
+    try {
+      print('Creazione chat con dati: $chatData');
+      final docRef = await _chatsCollection.add(chatData);
+      print('Chat creata con ID: ${docRef.id}');
+      return docRef.id;
+    } catch (e) {
+      print('Errore nella creazione della chat: $e');
+      throw Exception('Errore nella creazione della chat: $e');
     }
   }
 
@@ -83,11 +96,21 @@ class ChatRepository {
     }
   }
 
-  // Aggiorna una chat
+  // METODO AGGIORNATO per aggiornare una chat esistente
   Future<void> updateChat(String chatId, Map<String, dynamic> updates) async {
     try {
+      print('Aggiornamento chat: $chatId');
+      print('Dati aggiornamento: $updates');
+
+      // Aggiungi timestamp di aggiornamento se non presente
+      if (!updates.containsKey('updatedAt')) {
+        updates['updatedAt'] = Timestamp.now();
+      }
+
       await _chatsCollection.doc(chatId).update(updates);
+      print('Chat aggiornata con successo');
     } catch (e) {
+      print('Errore nell\'aggiornamento della chat: $e');
       throw Exception('Errore durante l\'aggiornamento della chat: $e');
     }
   }
@@ -97,6 +120,7 @@ class ChatRepository {
     try {
       await _chatsCollection.doc(chatId).update({
         'isActive': false,
+        'deletedAt': Timestamp.now(),
       });
     } catch (e) {
       throw Exception('Errore durante l\'eliminazione della chat: $e');

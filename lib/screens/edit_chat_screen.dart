@@ -1,27 +1,21 @@
-// screens/create_chat_screen.dart
+// screens/edit_chat_screen.dart
 import 'package:flutter/material.dart';
 import '../models/chat_model.dart';
 import '../repositories/chat_repository.dart';
 
-class CreateChatScreen extends StatefulWidget {
-  final String creatorId;
-  final String creatorName;
-  final ChatModel? chatToEdit; // Nuovo parametro per la modalità modifica
-  final bool isEditing; // Flag per distinguere creazione da modifica
+class EditChatScreen extends StatefulWidget {
+  final ChatModel chatToEdit; // Chat da modificare
 
-  const CreateChatScreen({
+  const EditChatScreen({
     super.key,
-    required this.creatorId,
-    required this.creatorName,
-    this.chatToEdit,
-    this.isEditing = false,
+    required this.chatToEdit,
   });
 
   @override
-  State<CreateChatScreen> createState() => _CreateChatScreenState();
+  State<EditChatScreen> createState() => _EditChatScreenState();
 }
 
-class _CreateChatScreenState extends State<CreateChatScreen> {
+class _EditChatScreenState extends State<EditChatScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -42,12 +36,10 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
   @override
   void initState() {
     super.initState();
-    // Se siamo in modalità modifica, precompila i campi
-    if (widget.isEditing && widget.chatToEdit != null) {
-      _titleController.text = widget.chatToEdit!.title;
-      _descriptionController.text = widget.chatToEdit!.description ?? '';
-      _selectedRoles = List<String>.from(widget.chatToEdit!.allowedRoles);
-    }
+    // Precompila i campi con i dati della chat da modificare
+    _titleController.text = widget.chatToEdit.title;
+    _descriptionController.text = widget.chatToEdit.description ?? '';
+    _selectedRoles = List<String>.from(widget.chatToEdit.allowedRoles);
   }
 
   @override
@@ -55,7 +47,7 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text(widget.isEditing ? 'Modifica Chat' : 'Crea Nuova Chat'),
+        title: const Text('Modifica Chat'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 1,
@@ -72,18 +64,16 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Titolo sezione
-              Text(
-                widget.isEditing ? 'Modifica dettagli della Chat' : 'Dettagli della Chat',
-                style: const TextStyle(
+              const Text(
+                'Modifica dettagli della Chat',
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                widget.isEditing
-                    ? 'Modifica i campi sottostanti per aggiornare la chat'
-                    : 'Compila i campi sottostanti per creare una nuova chat',
+                'Modifica i campi sottostanti per aggiornare la chat',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey[600],
@@ -310,10 +300,10 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
             ),
             const SizedBox(width: 16),
 
-            // Crea/Modifica Chat
+            // Salva Modifiche
             Expanded(
               child: ElevatedButton(
-                onPressed: _isLoading ? null : (widget.isEditing ? _updateChat : _createChat),
+                onPressed: _isLoading ? null : _updateChat,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
@@ -331,9 +321,9 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
                     color: Colors.white,
                   ),
                 )
-                    : Text(
-                  widget.isEditing ? 'Salva Modifiche' : 'Crea Chat',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    : const Text(
+                  'Salva Modifiche',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -343,69 +333,12 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
     );
   }
 
-  Future<void> _createChat() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    if (_selectedRoles.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Seleziona almeno un ruolo')),
-      );
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    try {
-      final chat = ChatModel(
-        id: '', // Verrà generato da Firebase
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        creatorId: widget.creatorId,
-        creatorName: widget.creatorName,
-        accessType: ChatAccessType.role,
-        allowedRoles: _selectedRoles,
-        allowedUserIds: [], // Non più utilizzato
-        allowedUserNames: [], // Non più utilizzato
-        createdAt: DateTime.now(),
-      );
-
-      await _chatRepository.createChat(chat);
-
-      if (mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Chat creata con successo!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Errore nella creazione: $e')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
   Future<void> _updateChat() async {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedRoles.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Seleziona almeno un ruolo')),
-      );
-      return;
-    }
-
-    if (widget.chatToEdit == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Errore: chat non trovata')),
       );
       return;
     }
@@ -419,10 +352,10 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
         'allowedRoles': _selectedRoles,
       };
 
-      await _chatRepository.updateChat(widget.chatToEdit!.id, updates);
+      await _chatRepository.updateChat(widget.chatToEdit.id, updates);
 
       if (mounted) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(true); // Ritorna true per indicare che la chat è stata modificata
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Chat modificata con successo!'),

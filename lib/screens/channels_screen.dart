@@ -1,5 +1,3 @@
-// channels_screen.dart - Versione corretta con debug migliorato
-
 import 'package:flutter/material.dart';
 import '../widget/custom_top_bar.dart';
 import '../models/chat_model.dart';
@@ -8,6 +6,7 @@ import '../repositories/chat_repository.dart';
 import '../repositories/auth_repository.dart';
 import '../screens/create_chat_screen.dart';
 import '../screens/chat_screen.dart';
+import '../screens/edit_chat_screen.dart';
 
 class ChannelsScreen extends StatefulWidget {
   const ChannelsScreen({super.key});
@@ -198,20 +197,6 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
             Row(
               children: [
                 Icon(
-                  Icons.person,
-                  size: 14,
-                  color: Colors.grey[600],
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Creata da ${chat.creatorName}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Icon(
                   chat.accessType == ChatAccessType.role
                       ? Icons.group
                       : Icons.person_outline,
@@ -230,23 +215,13 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
             ),
           ],
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isCreator) ...[
-              // Pulsante per gestire la chat (solo per il creatore)
-              IconButton(
-                onPressed: () => _showChatOptions(chat),
-                icon: const Icon(Icons.more_vert),
-                tooltip: 'Opzioni chat',
-              ),
-            ],
-            Icon(
-              Icons.chevron_right,
-              color: Colors.grey[400],
-            ),
-          ],
-        ),
+        trailing: isCreator
+            ? IconButton(
+          onPressed: () => _showChatOptions(chat),
+          icon: const Icon(Icons.more_vert),
+          tooltip: 'Opzioni chat',
+        )
+            : null,
         onTap: () {
           print('Tap su chat: ${chat.title} (ID: ${chat.id})');
           _openChat(chat);
@@ -316,10 +291,19 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
   }
 
   void _editChat(ChatModel chat) {
-    // TODO: Implementare modifica chat
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Funzionalità in sviluppo')),
-    );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditChatScreen(chatToEdit: chat),
+      ),
+    ).then((result) {
+      // Se la chat è stata modificata (result == true), ricarica la lista
+      if (result == true) {
+        print('Chat modificata, ricaricamento lista...');
+        // La lista si aggiornerà automaticamente grazie al StreamBuilder
+        // ma possiamo forzare un refresh se necessario
+        _loadCurrentUser();
+      }
+    });
   }
 
   void _deleteChat(ChatModel chat) {
@@ -359,7 +343,6 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
     );
   }
 
-  // CORREZIONE: Metodo _openChat con debug migliorato e gestione errori
   void _openChat(ChatModel chat) {
     print('Tentativo di apertura chat: ${chat.title}');
     print('Chat ID: ${chat.id}');
