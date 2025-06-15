@@ -1,11 +1,10 @@
-// screens/chat_screen.dart
 import 'package:flutter/material.dart';
 import '../models/chat_model.dart';
 import '../models/user_model.dart';
 import '../models/message_model.dart';
 import '../repositories/message_repository.dart';
 import '../repositories/auth_repository.dart';
-import '../services/notification_service.dart'; // AGGIUNTO
+import '../services/notification_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final ChatModel chat;
@@ -24,7 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final MessageRepository _messageRepository = MessageRepository();
   final AuthRepository _authRepository = AuthRepository();
-  final NotificationService _notificationService = NotificationService(); // AGGIUNTO
+  final NotificationService _notificationService = NotificationService();
 
   UserModel? _currentUser;
   Stream<List<MessageModel>>? _messagesStream;
@@ -80,15 +79,12 @@ class _ChatScreenState extends State<ChatScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
         children: [
-          // Area messaggi
           Expanded(
             child: _buildMessagesList(),
           ),
 
-          // Area input (solo per il creatore)
           if (_canSendMessages) _buildMessageInput(),
 
-          // Messaggio per utenti che non possono scrivere
           if (!_canSendMessages) _buildReadOnlyNotice(),
         ],
       ),
@@ -133,22 +129,17 @@ class _ChatScreenState extends State<ChatScreen> {
 
         final messages = snapshot.data ?? [];
 
-        // Crea la lista di messaggi con il messaggio neutrale del creatore all'inizio
         final displayMessages = <dynamic>[];
 
-        // Aggiungi il messaggio neutrale del creatore come primo elemento
         displayMessages.add('creator_info');
 
-        // Aggiungi tutti i messaggi reali
         displayMessages.addAll(messages);
 
         if (messages.isEmpty) {
           return Column(
             children: [
-              // Messaggio neutrale del creatore
               _buildCreatorInfoMessage(),
 
-              // Messaggio di chat vuota
               Expanded(
                 child: Center(
                   child: Column(
@@ -183,7 +174,6 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         }
 
-        // Auto-scroll verso il basso quando arrivano nuovi messaggi
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_scrollController.hasClients) {
             _scrollController.animateTo(
@@ -237,8 +227,6 @@ class _ChatScreenState extends State<ChatScreen> {
     final isFromCreator = message.senderId == widget.chat.creatorId;
     final isFromCurrentUser = message.senderId == _currentUser?.uid;
 
-    // Il messaggio va a destra se è dal creatore E dall'utente corrente
-    // Oppure se l'utente corrente è il creatore (i suoi messaggi vanno sempre a destra)
     final showOnRight = isFromCurrentUser && isFromCreator;
 
     return Container(
@@ -247,7 +235,6 @@ class _ChatScreenState extends State<ChatScreen> {
         mainAxisAlignment: showOnRight ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Avatar a sinistra (solo per messaggi a sinistra)
           if (!showOnRight) ...[
             CircleAvatar(
               radius: 20,
@@ -265,7 +252,6 @@ class _ChatScreenState extends State<ChatScreen> {
             const SizedBox(width: 12),
           ],
 
-          // Contenuto messaggio
           Flexible(
             child: Container(
               constraints: BoxConstraints(
@@ -276,7 +262,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     ? CrossAxisAlignment.end
                     : CrossAxisAlignment.start,
                 children: [
-                  // Nome e ruolo (solo per messaggi a sinistra)
                   if (!showOnRight)
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -314,12 +299,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
                   if (!showOnRight) const SizedBox(height: 4),
 
-                  // Bubble del messaggio
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: showOnRight
-                          ? const Color(0xFF009E3D)  // Verde per messaggi a destra
+                          ? const Color(0xFF009E3D)
                           : isFromCreator
                           ? const Color(0xFF009E3D).withOpacity(0.1)
                           : Colors.grey[100],
@@ -350,7 +334,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
 
-                  // Timestamp
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
@@ -366,7 +349,6 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
 
-          // Avatar a destra (solo per messaggi a destra)
           if (showOnRight) ...[
             const SizedBox(width: 12),
             CircleAvatar(
@@ -476,7 +458,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // METODO AGGIORNATO con notifiche dinamiche
   Future<void> _sendMessage() async {
     final content = _messageController.text.trim();
     if (content.isEmpty || _currentUser == null) return;
@@ -485,7 +466,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       final message = MessageModel(
-        id: '', // Verrà generato da Firebase
+        id: '',
         chatId: widget.chat.id,
         content: content,
         senderId: _currentUser!.uid,
@@ -495,7 +476,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
       await _messageRepository.sendMessage(message);
 
-      // AGGIUNTO: Crea notifica dinamica dopo l'invio del messaggio
       _notificationService.addMessageNotification(
         _currentUser!.name,
         content,
@@ -504,7 +484,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
       _messageController.clear();
 
-      // Scroll verso il basso dopo l'invio
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,

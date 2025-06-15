@@ -37,7 +37,6 @@ class UserModel {
     );
   }
 
-  // Converti UserModel in Map per Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,

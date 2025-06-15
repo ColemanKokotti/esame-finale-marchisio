@@ -47,7 +47,6 @@ class _AllNotificationsScreenState extends State<NotificationsScreen> {
       ),
       body: Column(
         children: [
-          // Info profilo corrente (senza pulsanti debug)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(8),

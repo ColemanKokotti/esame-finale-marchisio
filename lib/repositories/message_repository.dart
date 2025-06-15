@@ -1,20 +1,16 @@
-// repositories/message_repository.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/message_model.dart';
 
 class MessageRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Riferimento alla collezione messaggi di una chat specifica (subcollection)
   CollectionReference _getChatMessagesCollection(String chatId) =>
       _firestore.collection('chats').doc(chatId).collection('messages');
 
-  // Invia un nuovo messaggio
   Future<void> sendMessage(MessageModel message) async {
     try {
       print('Invio messaggio: ${message.content}');
 
-      // Usa la subcollection invece della collezione principale
       await _getChatMessagesCollection(message.chatId).add(message.toMap());
 
       print('Messaggio inviato con successo');
@@ -24,7 +20,6 @@ class MessageRepository {
     }
   }
 
-  // Ottieni stream dei messaggi di una chat
   Stream<List<MessageModel>> getChatMessages(String chatId) {
     try {
       print('Configurazione stream messaggi per chat: $chatId');
@@ -47,7 +42,6 @@ class MessageRepository {
     }
   }
 
-  // Ottieni un singolo messaggio per ID
   Future<MessageModel?> getMessageById(String chatId, String messageId) async {
     try {
       final doc = await _getChatMessagesCollection(chatId).doc(messageId).get();
@@ -64,7 +58,6 @@ class MessageRepository {
     }
   }
 
-  // Elimina un messaggio (solo per admin o creatore)
   Future<void> deleteMessage(String chatId, String messageId) async {
     try {
       await _getChatMessagesCollection(chatId).doc(messageId).delete();
@@ -75,12 +68,10 @@ class MessageRepository {
     }
   }
 
-  // Elimina tutti i messaggi di una chat (quando si elimina la chat)
   Future<void> deleteChatMessages(String chatId) async {
     try {
       final snapshot = await _getChatMessagesCollection(chatId).get();
 
-      // Elimina tutti i messaggi in batch
       final batch = _firestore.batch();
       for (final doc in snapshot.docs) {
         batch.delete(doc.reference);
@@ -94,7 +85,6 @@ class MessageRepository {
     }
   }
 
-  // Modifica un messaggio (solo per il mittente)
   Future<void> updateMessage(String chatId, String messageId, String newContent) async {
     try {
       await _getChatMessagesCollection(chatId).doc(messageId).update({
@@ -109,7 +99,6 @@ class MessageRepository {
     }
   }
 
-  // Ottieni statistiche messaggi per una chat
   Future<Map<String, int>> getChatMessageStats(String chatId) async {
     try {
       final snapshot = await _getChatMessagesCollection(chatId).get();
@@ -117,7 +106,6 @@ class MessageRepository {
       final stats = <String, int>{};
       stats['totalMessages'] = snapshot.docs.length;
 
-      // Conta messaggi per mittente
       for (final doc in snapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
         final senderId = data['senderId'] as String? ?? 'unknown';
@@ -131,7 +119,6 @@ class MessageRepository {
     }
   }
 
-  // Cerca messaggi per contenuto
   Future<List<MessageModel>> searchMessages(String chatId, String searchTerm) async {
     try {
       final snapshot = await _getChatMessagesCollection(chatId)

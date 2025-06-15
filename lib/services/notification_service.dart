@@ -10,7 +10,6 @@ class NotificationService extends ChangeNotifier {
 
   List<Map<String, dynamic>> get notifications => List.unmodifiable(_notifications);
 
-  // Metodo per aggiungere notifica di creazione chat
   void addChatCreatedNotification(String chatName, String creatorName) {
     final notification = {
       'sender': 'Sistema',
@@ -22,15 +21,14 @@ class NotificationService extends ChangeNotifier {
       'creatorName': creatorName
     };
 
-    _notifications.insert(0, notification); // Inserisce all'inizio per mostrare le più recenti
+    _notifications.insert(0, notification);
     notifyListeners();
 
     print('Notifica creazione chat aggiunta: $chatName da $creatorName');
   }
 
-  // Metodo per aggiungere notifica di messaggio
+
   void addMessageNotification(String senderName, String message, String chatName) {
-    // Limita la lunghezza del messaggio per la notifica
     String truncatedMessage = message.length > 50 ?
     '${message.substring(0, 50)}...' : message;
 
@@ -50,7 +48,6 @@ class NotificationService extends ChangeNotifier {
     print('Notifica messaggio aggiunta: $senderName in $chatName');
   }
 
-  // Metodo per aggiungere notifica generica (per compatibilità)
   void addNotification(String sender, String message, {bool visibleToAll = true}) {
     final notification = {
       'sender': sender,
@@ -64,30 +61,25 @@ class NotificationService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Rimuovi notifica
   void removeNotification(Map<String, dynamic> notification) {
     _notifications.remove(notification);
     notifyListeners();
   }
 
-  // Pulisci tutte le notifiche
   void clearNotifications() {
     _notifications.clear();
     notifyListeners();
   }
 
-  // Aggiorna il profilo utente corrente
   void updateCurrentUserProfile(String profile) {
     currentUserProfile = profile;
     notifyListeners();
   }
 
-  // Ottieni notifiche per tipo
   List<Map<String, dynamic>> getNotificationsByType(String type) {
     return _notifications.where((notif) => notif['type'] == type).toList();
   }
 
-  // Ottieni notifiche per chat specifica
   List<Map<String, dynamic>> getNotificationsForChat(String chatName) {
     return _notifications.where((notif) =>
     notif['chatName'] == chatName &&

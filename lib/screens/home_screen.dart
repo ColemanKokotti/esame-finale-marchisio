@@ -34,12 +34,49 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
+  String _convertGoogleDriveUrl(String url) {
+    if (url.contains('drive.google.com')) {
+      RegExp regExp = RegExp(r'/d/([a-zA-Z0-9-_]+)');
+      Match? match = regExp.firstMatch(url);
+      if (match != null) {
+        String fileId = match.group(1)!;
+        if (url.contains('document')) {
+          return 'https://docs.google.com/document/d/$fileId/edit';
+        }
+        return 'https://drive.google.com/file/d/$fileId/view';
+      }
+    }
+    return url;
+  }
+
   void _openUrl(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      debugPrint('Impossibile aprire il link: $url');
+    try {
+      String convertedUrl = _convertGoogleDriveUrl(url);
+      final Uri uri = Uri.parse(convertedUrl);
+
+      debugPrint('Tentativo di aprire: $convertedUrl');
+
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.platformDefault,
+        );
+      }
+    } catch (e) {
+      debugPrint('Errore nell\'apertura del link: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Errore nell\'apertura del link: ${e.toString()}'),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
     }
   }
 
@@ -71,32 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildResourceButton({required IconData icon, required String text, required VoidCallback onPressed}) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFE0F2E9),
-        foregroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        padding: const EdgeInsets.all(16),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 40, color: const Color(0xFF009E3D)),
-          const SizedBox(height: 8),
-          Text(
-            text,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final notifications = _notificationService.notifications;
@@ -113,7 +124,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          // Carosello notifiche - mostra solo se ci sono notifiche
           if (notifications.isNotEmpty)
             SizedBox(
               height: 120,
@@ -135,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-          // Messaggio quando non ci sono notifiche
           if (notifications.isEmpty)
             Container(
               height: 60,
@@ -165,19 +174,51 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
                 children: [
-                  _buildResourceButton(
-                    icon: Icons.book,
-                    text: 'Guida Introduttiva',
+                  ElevatedButton(
                     onPressed: () {
                       _openUrl('https://docs.google.com/document/d/10xFoRI0zpqXBMhLK_Ots1rhlN1szigIL/edit?usp=drive_link');
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFE0F2E9),
+                      foregroundColor: Colors.black,
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(20),
+                    ),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.book, size: 40, color: Color(0xFF009E3D)),
+                        SizedBox(height: 8),
+                        Text(
+                          'Manuale di Gestione',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
                   ),
-                  _buildResourceButton(
-                    icon: Icons.support_agent,
-                    text: 'Programma Settimanale',
+                  ElevatedButton(
                     onPressed: () {
                       _openUrl('https://drive.google.com/file/d/1-wvzY98gRuACywvks04reRGoEAnZ9Q-6/view?usp=drive_link');
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFE0F2E9),
+                      foregroundColor: Colors.black,
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(20),
+                    ),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.support_agent, size: 40, color: Color(0xFF009E3D)),
+                        SizedBox(height: 8),
+                        Text(
+                          'Programma Settimanale',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

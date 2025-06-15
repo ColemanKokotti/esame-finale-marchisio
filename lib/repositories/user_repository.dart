@@ -1,4 +1,3 @@
-// repositories/user_repository.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 
@@ -8,10 +7,8 @@ class UserRepository {
   UserRepository({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  // Collezione users
   CollectionReference get _usersCollection => _firestore.collection('users');
 
-  // Crea o aggiorna un utente
   Future<void> createOrUpdateUser(UserModel user) async {
     try {
       await _usersCollection.doc(user.uid).set(
@@ -23,7 +20,6 @@ class UserRepository {
     }
   }
 
-  // Ottieni un utente tramite UID
   Future<UserModel?> getUserById(String uid) async {
     try {
       final doc = await _usersCollection.doc(uid).get();
@@ -36,7 +32,6 @@ class UserRepository {
     }
   }
 
-  // Stream di tutti gli utenti
   Stream<List<UserModel>> getAllUsers() {
     return _usersCollection
         .orderBy('name')
@@ -46,7 +41,6 @@ class UserRepository {
         .toList());
   }
 
-  // Stream di tutti gli utenti online
   Stream<List<UserModel>> getOnlineUsers() {
     return _usersCollection
         .where('isOnline', isEqualTo: true)
@@ -57,7 +51,6 @@ class UserRepository {
         .toList());
   }
 
-  // NUOVO: Stream di utenti filtrati per ruolo
   Stream<List<UserModel>> getUsersByRole(String role) {
     return _usersCollection
         .where('role', isEqualTo: role)
@@ -68,7 +61,6 @@ class UserRepository {
         .toList());
   }
 
-  // NUOVO: Stream di utenti con filtro dinamico
   Stream<List<UserModel>> getUsersWithFilter({
     String? role,
     bool? isOnline,
@@ -87,7 +79,6 @@ class UserRepository {
         snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList());
   }
 
-  // Aggiorna il ruolo di un utente
   Future<void> updateUserRole(String uid, String newRole) async {
     try {
       await _usersCollection.doc(uid).update({
@@ -98,7 +89,6 @@ class UserRepository {
     }
   }
 
-  // Aggiorna lo stato online/offline di un utente
   Future<void> updateUserOnlineStatus(String uid, bool isOnline) async {
     try {
       await _usersCollection.doc(uid).update({
@@ -110,7 +100,6 @@ class UserRepository {
     }
   }
 
-  // Aggiorna il nome dell'utente
   Future<void> updateUserName(String uid, String newName) async {
     try {
       await _usersCollection.doc(uid).update({
@@ -121,7 +110,6 @@ class UserRepository {
     }
   }
 
-  // Elimina un utente
   Future<void> deleteUser(String uid) async {
     try {
       await _usersCollection.doc(uid).delete();
@@ -130,7 +118,6 @@ class UserRepository {
     }
   }
 
-  // Ottieni statistiche utenti
   Future<Map<String, int>> getUserStats() async {
     try {
       final allUsersSnapshot = await _usersCollection.get();
@@ -148,7 +135,6 @@ class UserRepository {
     }
   }
 
-  // NUOVO: Ottieni statistiche per ruolo
   Future<Map<String, int>> getStatsPerRole() async {
     try {
       final allUsersSnapshot = await _usersCollection.get();

@@ -1,22 +1,21 @@
-// models/notification_model.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum NotificationType {
   welcome,
-  chatInvite, // User invited to a specific chat (e.g. by direct add, or new chat created with role)
-  newMessage, // New message in a chat
-  chatCreation, // A new chat has been created (for specific roles)
+  chatInvite,
+  newMessage,
+  chatCreation,
 }
 
 class NotificationModel {
   final String id;
-  final String userId; // The recipient of the notification
-  final String sender; // Who sent the notification (e.g., 'System', 'Admin', or a user's name)
+  final String userId;
+  final String sender;
   final String message;
   final NotificationType type;
   final DateTime createdAt;
   final bool isRead;
-  final Map<String, dynamic>? metadata; // For additional data like chatId, messageId, etc.
+  final Map<String, dynamic>? metadata;
 
   NotificationModel({
     required this.id,

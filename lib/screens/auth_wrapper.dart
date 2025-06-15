@@ -69,7 +69,6 @@ class AuthWrapper extends StatelessWidget {
           );
         }
 
-        // AuthUnauthenticated o stato di default
         return const LoginScreen();
       },
     );

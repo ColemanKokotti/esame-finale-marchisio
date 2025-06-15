@@ -1,4 +1,3 @@
-// models/chat_model.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum ChatAccessType { role, specific_users }
@@ -10,9 +9,9 @@ class ChatModel {
   final String creatorId;
   final String creatorName;
   final ChatAccessType accessType;
-  final List<String> allowedRoles; // Per accesso tramite ruolo
-  final List<String> allowedUserIds; // Per accesso tramite utenti specifici
-  final List<String> allowedUserNames; // Nomi degli utenti per display
+  final List<String> allowedRoles;
+  final List<String> allowedUserIds;
+  final List<String> allowedUserNames;
   final DateTime createdAt;
   final DateTime? lastMessageAt;
   final bool isActive;
@@ -32,7 +31,6 @@ class ChatModel {
     this.isActive = true,
   });
 
-  // Converte in Map per Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'title': title,
@@ -49,7 +47,6 @@ class ChatModel {
     };
   }
 
-  // Crea da DocumentSnapshot di Firestore
   factory ChatModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return ChatModel(
@@ -73,7 +70,6 @@ class ChatModel {
     );
   }
 
-  // Copia con modifiche
   ChatModel copyWith({
     String? title,
     String? description,
@@ -100,9 +96,7 @@ class ChatModel {
     );
   }
 
-  // Verifica se un utente può accedere alla chat
   bool canUserAccess(String userId, String userRole) {
-    // Il creatore può sempre accedere
     if (userId == creatorId) return true;
 
     switch (accessType) {

@@ -1,4 +1,3 @@
-// repositories/auth_repository.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
 import 'user_repository.dart';
@@ -13,30 +12,24 @@ class AuthRepository {
   }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
         _userRepository = userRepository ?? UserRepository();
 
-  // Stream per monitorare lo stato di autenticazione
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
-  // Utente corrente
   User? get currentUser => _firebaseAuth.currentUser;
 
-  // Inizializza l'utente predefinito se non esiste
   Future<void> initializeDefaultUser() async {
     const String defaultEmail = 'prova@gmail.com';
     const String defaultPassword = 'prova123';
     const String defaultName = 'Mario Rossi';
 
     try {
-      // Verifica se l'utente esiste già
       final methods = await _firebaseAuth.fetchSignInMethodsForEmail(defaultEmail);
 
       if (methods.isEmpty) {
-        // L'utente non esiste, crealo
         final credential = await _firebaseAuth.createUserWithEmailAndPassword(
           email: defaultEmail,
           password: defaultPassword,
         );
 
-        // Crea il profilo utente su Firestore
         if (credential.user != null) {
           final userModel = UserModel(
             uid: credential.user!.uid,
@@ -53,7 +46,6 @@ class AuthRepository {
       }
     } catch (e) {
       if (e is FirebaseAuthException && e.code == 'email-already-in-use') {
-        // L'utente esiste già, va bene
         print('Utente predefinito già esistente');
       } else {
         print('Errore durante l\'inizializzazione dell\'utente predefinito: $e');
@@ -61,7 +53,6 @@ class AuthRepository {
     }
   }
 
-  // Accesso con email e password
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
     try {
       final credential = await _firebaseAuth.signInWithEmailAndPassword(
@@ -69,7 +60,6 @@ class AuthRepository {
         password: password,
       );
 
-      // Aggiorna lo stato online dell'utente
       if (credential.user != null) {
         await _userRepository.updateUserOnlineStatus(credential.user!.uid, true);
       }
@@ -80,7 +70,6 @@ class AuthRepository {
     }
   }
 
-  // Registrazione con email e password
   Future<User?> registerWithEmailAndPassword({
     required String email,
     required String password,
@@ -93,7 +82,6 @@ class AuthRepository {
         password: password,
       );
 
-      // Crea il profilo utente su Firestore
       if (credential.user != null) {
         final userModel = UserModel(
           uid: credential.user!.uid,
@@ -113,10 +101,8 @@ class AuthRepository {
     }
   }
 
-  // Logout
   Future<void> signOut() async {
     try {
-      // Aggiorna lo stato offline prima del logout
       if (currentUser != null) {
         await _userRepository.updateUserOnlineStatus(currentUser!.uid, false);
       }
@@ -127,7 +113,6 @@ class AuthRepository {
     }
   }
 
-  // Ottieni il profilo utente corrente
   Future<UserModel?> getCurrentUserProfile() async {
     if (currentUser != null) {
       return await _userRepository.getUserById(currentUser!.uid);
@@ -135,7 +120,6 @@ class AuthRepository {
     return null;
   }
 
-  // Aggiorna il profilo utente corrente
   Future<void> updateCurrentUserProfile({
     String? name,
     String? role,
@@ -156,7 +140,6 @@ class AuthRepository {
     }
   }
 
-  // Gestione delle eccezioni Firebase
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':

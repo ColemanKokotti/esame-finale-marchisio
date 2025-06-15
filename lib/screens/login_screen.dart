@@ -75,7 +75,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
 
-                  // Campo Email
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
@@ -97,7 +96,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Campo Password
                   TextFormField(
                     controller: _passwordController,
                     decoration: const InputDecoration(
@@ -119,7 +117,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Bottone di Login
                   BlocBuilder<AuthBloc, AuthState>(
                     builder: (context, state) {
                       final isLoading = state is AuthLoading;

@@ -20,23 +20,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthSignInRequested>(_onAuthSignInRequested);
     on<AuthSignOutRequested>(_onAuthSignOutRequested);
 
-    // Inizializza il monitoraggio dello stato di autenticazione
     _authStateSubscription = _authRepository.authStateChanges.listen((user) {
       if (user != null) {
-        // Imposta il profilo utente nel NotificationService
         _setUserProfileFromFirebaseUser(user);
         emit(AuthAuthenticated(user: user));
       } else {
-        // Pulisci il profilo utente quando l'utente non è autenticato
         _notificationService.updateCurrentUserProfile('');
         emit(AuthUnauthenticated());
       }
     });
   }
 
-  // Metodo helper per impostare il profilo utente dal Firebase User
   void _setUserProfileFromFirebaseUser(User user) {
-    // Usa displayName se disponibile, altrimenti usa email
     final userProfile = user.displayName ?? user.email ?? 'Utente Sconosciuto';
     _notificationService.updateCurrentUserProfile(userProfile);
   }
@@ -48,17 +43,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       emit(AuthLoading());
 
-      // Inizializza l'utente predefinito
       await _authRepository.initializeDefaultUser();
 
-      // Controlla se c'è un utente già autenticato
       final currentUser = _authRepository.currentUser;
       if (currentUser != null) {
-        // Imposta il profilo utente nel NotificationService
         _setUserProfileFromFirebaseUser(currentUser);
         emit(AuthAuthenticated(user: currentUser));
       } else {
-        // Assicurati che il profilo sia vuoto se non c'è utente
         _notificationService.updateCurrentUserProfile('');
         emit(AuthUnauthenticated());
       }
@@ -74,11 +65,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final currentUser = _authRepository.currentUser;
       if (currentUser != null) {
-        // Imposta il profilo utente nel NotificationService
         _setUserProfileFromFirebaseUser(currentUser);
         emit(AuthAuthenticated(user: currentUser));
       } else {
-        // Pulisci il profilo utente
         _notificationService.updateCurrentUserProfile('');
         emit(AuthUnauthenticated());
       }
@@ -100,16 +89,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (user != null) {
-        // Imposta il profilo utente nel NotificationService
         _setUserProfileFromFirebaseUser(user);
         emit(AuthAuthenticated(user: user));
       } else {
-        // Assicurati che il profilo sia vuoto in caso di errore
         _notificationService.updateCurrentUserProfile('');
         emit(const AuthError(message: 'Errore durante l\'accesso'));
       }
     } catch (e) {
-      // Pulisci il profilo in caso di errore
       _notificationService.updateCurrentUserProfile('');
       emit(AuthError(message: e.toString()));
     }
@@ -123,7 +109,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       await _authRepository.signOut();
 
-      // Pulisci il profilo utente dal NotificationService
       _notificationService.updateCurrentUserProfile('');
 
       emit(AuthUnauthenticated());

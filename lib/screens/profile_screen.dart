@@ -257,7 +257,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
 
-    // Aggiungi questa condizione per gestire il caso in cui il profilo non esiste
     if (currentUserProfile == null) {
       return Scaffold(
         appBar: AppBar(
@@ -326,7 +325,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Foto profilo (placeholder)
             Container(
               width: 120,
               height: 120,
@@ -348,7 +346,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 8),
 
-            // Email (readonly)
             Text(
               currentUserProfile!.email,
               style: TextStyle(
@@ -358,7 +355,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Ruolo (readonly display)
+
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -381,7 +378,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Stato online/offline
             SizedBox(
               width: double.infinity,
               height: 50,

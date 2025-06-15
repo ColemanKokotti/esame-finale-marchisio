@@ -1,4 +1,3 @@
-// repositories/notification_repository.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/notification_model.dart';
 
@@ -8,7 +7,6 @@ class NotificationRepository {
   CollectionReference get _notificationsCollection =>
       _firestore.collection('notifications');
 
-  // Crea notifica di benvenuto per nuovo utente
   Future<void> createWelcomeNotification(String userId) async {
     try {
       final notification = NotificationModel(
@@ -28,7 +26,6 @@ class NotificationRepository {
     }
   }
 
-  // Crea notifica per invito chat
   Future<void> createChatInviteNotification({
     required String userId,
     required String inviterName,
@@ -43,7 +40,7 @@ class NotificationRepository {
         message: 'Ti ha invitato alla chat "$chatTitle".',
         type: NotificationType.chatInvite,
         createdAt: DateTime.now(),
-        metadata: {'chatId': chatId}, // Aggiungi metadati per navigazione
+        metadata: {'chatId': chatId},
       );
 
       await _notificationsCollection.add(notification.toMap());
@@ -54,7 +51,6 @@ class NotificationRepository {
     }
   }
 
-  // Crea notifica per nuovo messaggio in chat
   Future<void> createNewMessageNotification({
     required String userId,
     required String senderName,
@@ -79,7 +75,6 @@ class NotificationRepository {
     }
   }
 
-  // Ottieni tutte le notifiche per un utente specifico
   Stream<List<NotificationModel>> getUserNotifications(String userId) {
     try {
       return _notificationsCollection
@@ -95,12 +90,11 @@ class NotificationRepository {
     }
   }
 
-  // NUOVO: Ottieni solo notifiche non lette per un utente specifico
   Stream<List<NotificationModel>> getUnreadNotifications(String userId) {
     try {
       return _notificationsCollection
           .where('userId', isEqualTo: userId)
-          .where('isRead', isEqualTo: false) // Filtra per non lette
+          .where('isRead', isEqualTo: false)
           .orderBy('createdAt', descending: true)
           .snapshots()
           .map((snapshot) => snapshot.docs
@@ -108,11 +102,10 @@ class NotificationRepository {
           .toList());
     } catch (e) {
       print('Errore nel recupero notifiche non lette: $e');
-      return Stream.value([]); // Restituisce uno stream vuoto in caso di errore
+      return Stream.value([]);
     }
   }
 
-  // Conta le notifiche non lette per un utente
   Stream<int> getUnreadNotificationsCount(String userId) {
     try {
       return _notificationsCollection
@@ -126,7 +119,6 @@ class NotificationRepository {
     }
   }
 
-  // Segna una notifica come letta
   Future<void> markNotificationAsRead(String notificationId) async {
     try {
       await _notificationsCollection.doc(notificationId).update({'isRead': true});
@@ -136,7 +128,6 @@ class NotificationRepository {
     }
   }
 
-  // Elimina una notifica
   Future<void> deleteNotification(String notificationId) async {
     try {
       await _notificationsCollection.doc(notificationId).delete();
@@ -146,7 +137,6 @@ class NotificationRepository {
     }
   }
 
-  // Test delle notifiche per sviluppo
   Future<void> createTestNotifications(String userId) async {
     try {
       await _notificationsCollection.add(NotificationModel(
@@ -164,7 +154,6 @@ class NotificationRepository {
     }
   }
 
-  // Pulisci notifiche vecchie (da chiamare periodicamente)
   Future<void> cleanOldNotifications(String userId, {int daysToKeep = 30}) async {
     try {
       final cutoffDate = DateTime.now().subtract(Duration(days: daysToKeep));
@@ -185,7 +174,6 @@ class NotificationRepository {
     }
   }
 
-  // Elimina tutte le notifiche di un utente (per testing)
   Future<void> deleteAllUserNotifications(String userId) async {
     try {
       final snapshot = await _notificationsCollection

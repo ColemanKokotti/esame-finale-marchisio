@@ -23,7 +23,6 @@ class _StaffScreenState extends State<StaffScreen> {
     _updateUsersStream();
   }
 
-  // Aggiorna lo stream in base al filtro selezionato
   void _updateUsersStream() {
     _usersStream = _userRepository.getUsersByRole(selectedRoleFilter);
   }
@@ -79,7 +78,6 @@ class _StaffScreenState extends State<StaffScreen> {
       ),
       body: Column(
         children: [
-          // Indicatore filtro attivo
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
@@ -102,7 +100,6 @@ class _StaffScreenState extends State<StaffScreen> {
             ),
           ),
 
-          // Lista utenti
           Expanded(
             child: StreamBuilder<List<UserModel>>(
               stream: _usersStream,
@@ -218,7 +215,6 @@ class _StaffScreenState extends State<StaffScreen> {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            // Avatar con indicatore di stato
             Stack(
               children: [
                 CircleAvatar(
@@ -253,7 +249,6 @@ class _StaffScreenState extends State<StaffScreen> {
 
             const SizedBox(width: 16),
 
-            // Informazioni utente
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,7 +322,6 @@ class _StaffScreenState extends State<StaffScreen> {
     );
   }
 
-  // Metodi helper per i colori e icone dei ruoli
   Color _getRoleColor(String role) {
     switch (role) {
       case 'IT':

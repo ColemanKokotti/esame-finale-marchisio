@@ -31,9 +31,7 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
             TextButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop();
-                // Usa il context originale per il BLoC
                 context.read<AuthBloc>().add(AuthSignOutRequested());
-                // Chiama il callback se fornito
                 onLogout?.call();
               },
               child: const Text(
@@ -67,13 +65,11 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Spazio a sinistra per bilanciare
           if (showActions)
             const SizedBox(width: 48)
           else
             const SizedBox(width: 24),
 
-          // Logo centrale
           ColorFiltered(
             colorFilter: const ColorFilter.mode(
               Colors.white,
@@ -93,12 +89,10 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
 
-          // Azioni a destra
           if (showActions)
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Bottone notifiche
                 IconButton(
                   onPressed: () => _handleNotification(context),
                   icon: const Icon(
@@ -108,7 +102,6 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   tooltip: 'Notifiche',
                 ),
-                // Bottone logout
                 IconButton(
                   onPressed: () => _handleLogout(context),
                   icon: const Icon(

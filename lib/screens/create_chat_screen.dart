@@ -1,4 +1,3 @@
-// screens/create_chat_screen.dart
 import 'package:flutter/material.dart';
 import '../models/chat_model.dart';
 import '../repositories/chat_repository.dart';
@@ -7,8 +6,8 @@ import '../services/notification_service.dart'; // AGGIUNTO
 class CreateChatScreen extends StatefulWidget {
   final String creatorId;
   final String creatorName;
-  final ChatModel? chatToEdit; // Nuovo parametro per la modalità modifica
-  final bool isEditing; // Flag per distinguere creazione da modifica
+  final ChatModel? chatToEdit;
+  final bool isEditing;
 
   const CreateChatScreen({
     super.key,
@@ -33,7 +32,6 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
   List<String> _selectedRoles = [];
   bool _isLoading = false;
 
-  // Ruoli disponibili con icone
   final List<Map<String, dynamic>> _availableRoles = [
     {'name': 'IT', 'icon': Icons.computer, 'color': Colors.blue},
     {'name': 'Staff', 'icon': Icons.business_center, 'color': Colors.green},
@@ -44,7 +42,6 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
   @override
   void initState() {
     super.initState();
-    // Se siamo in modalità modifica, precompila i campi
     if (widget.isEditing && widget.chatToEdit != null) {
       _titleController.text = widget.chatToEdit!.title;
       _descriptionController.text = widget.chatToEdit!.description ?? '';
@@ -73,27 +70,6 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Titolo sezione
-              Text(
-                widget.isEditing ? 'Modifica dettagli della Chat' : 'Dettagli della Chat',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                widget.isEditing
-                    ? 'Modifica i campi sottostanti per aggiornare la chat'
-                    : 'Compila i campi sottostanti per creare una nuova chat',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // Titolo Chat
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -128,7 +104,6 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Descrizione
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -158,7 +133,6 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Selezione Ruoli
               const Text(
                 'Seleziona i Ruoli che possono accedere:',
                 style: TextStyle(
@@ -248,7 +222,6 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Riepilogo selezionati
               if (_selectedRoles.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -277,7 +250,6 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
         ),
       ),
 
-      // Pulsanti in basso
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -292,7 +264,6 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
         ),
         child: Row(
           children: [
-            // Annulla
             Expanded(
               child: ElevatedButton(
                 onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
@@ -312,7 +283,6 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
             ),
             const SizedBox(width: 16),
 
-            // Crea/Modifica Chat
             Expanded(
               child: ElevatedButton(
                 onPressed: _isLoading ? null : (widget.isEditing ? _updateChat : _createChat),
@@ -358,26 +328,25 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final chatTitle = _titleController.text.trim(); // Ottieni il titolo dinamicamente
+      final chatTitle = _titleController.text.trim();
 
       final chat = ChatModel(
-        id: '', // Verrà generato da Firebase
+        id: '',
         title: chatTitle,
         description: _descriptionController.text.trim(),
         creatorId: widget.creatorId,
         creatorName: widget.creatorName,
         accessType: ChatAccessType.role,
         allowedRoles: _selectedRoles,
-        allowedUserIds: [], // Non più utilizzato
-        allowedUserNames: [], // Non più utilizzato
+        allowedUserIds: [],
+        allowedUserNames: [],
         createdAt: DateTime.now(),
       );
 
       await _chatRepository.createChat(chat);
 
-      // AGGIUNTO: Crea notifica dinamica con il nome della chat inserito dall'utente
       _notificationService.addChatCreatedNotification(
-        chatTitle, // Usa il titolo inserito dall'utente
+        chatTitle,
         widget.creatorName,
       );
 

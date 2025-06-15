@@ -1,4 +1,3 @@
-// models/message_model.dart
 class MessageModel {
   final String id;
   final String chatId;
@@ -16,7 +15,6 @@ class MessageModel {
     required this.timestamp,
   });
 
-  // Converti da Map (Firebase)
   factory MessageModel.fromMap(Map<String, dynamic> map, String id) {
     return MessageModel(
       id: id,
@@ -30,7 +28,6 @@ class MessageModel {
     );
   }
 
-  // Converti a Map (per Firebase)
   Map<String, dynamic> toMap() {
     return {
       'chatId': chatId,
@@ -41,7 +38,6 @@ class MessageModel {
     };
   }
 
-  // Copia con modifiche
   MessageModel copyWith({
     String? id,
     String? chatId,

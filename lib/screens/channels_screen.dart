@@ -58,7 +58,6 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
     return Scaffold(
       appBar: CustomTopBar(
         actions: [
-          // Pulsante + per creare nuova chat
           IconButton(
             onPressed: _currentUser != null ? _showCreateChatScreen : null,
             icon: const Icon(
@@ -296,11 +295,8 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
         builder: (context) => EditChatScreen(chatToEdit: chat),
       ),
     ).then((result) {
-      // Se la chat è stata modificata (result == true), ricarica la lista
       if (result == true) {
         print('Chat modificata, ricaricamento lista...');
-        // La lista si aggiornerà automaticamente grazie al StreamBuilder
-        // ma possiamo forzare un refresh se necessario
         _loadCurrentUser();
       }
     });

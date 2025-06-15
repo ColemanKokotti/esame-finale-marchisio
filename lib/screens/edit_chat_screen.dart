@@ -1,10 +1,9 @@
-// screens/edit_chat_screen.dart
 import 'package:flutter/material.dart';
 import '../models/chat_model.dart';
 import '../repositories/chat_repository.dart';
 
 class EditChatScreen extends StatefulWidget {
-  final ChatModel chatToEdit; // Chat da modificare
+  final ChatModel chatToEdit;
 
   const EditChatScreen({
     super.key,
@@ -25,7 +24,6 @@ class _EditChatScreenState extends State<EditChatScreen> {
   List<String> _selectedRoles = [];
   bool _isLoading = false;
 
-  // Ruoli disponibili con icone
   final List<Map<String, dynamic>> _availableRoles = [
     {'name': 'IT', 'icon': Icons.computer, 'color': Colors.blue},
     {'name': 'Staff', 'icon': Icons.business_center, 'color': Colors.green},
@@ -36,7 +34,6 @@ class _EditChatScreenState extends State<EditChatScreen> {
   @override
   void initState() {
     super.initState();
-    // Precompila i campi con i dati della chat da modificare
     _titleController.text = widget.chatToEdit.title;
     _descriptionController.text = widget.chatToEdit.description ?? '';
     _selectedRoles = List<String>.from(widget.chatToEdit.allowedRoles);
@@ -63,24 +60,6 @@ class _EditChatScreenState extends State<EditChatScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Titolo sezione
-              const Text(
-                'Modifica dettagli della Chat',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Modifica i campi sottostanti per aggiornare la chat',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
-              ),
-              const SizedBox(height: 32),
-
               // Titolo Chat
               Container(
                 decoration: BoxDecoration(
@@ -116,7 +95,6 @@ class _EditChatScreenState extends State<EditChatScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Descrizione
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -146,7 +124,6 @@ class _EditChatScreenState extends State<EditChatScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Selezione Ruoli
               const Text(
                 'Seleziona i Ruoli che possono accedere:',
                 style: TextStyle(
@@ -234,38 +211,11 @@ class _EditChatScreenState extends State<EditChatScreen> {
                   );
                 },
               ),
-              const SizedBox(height: 24),
-
-              // Riepilogo selezionati
-              if (_selectedRoles.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.blue[200]!),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Ruoli selezionati:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(_selectedRoles.join(', ')),
-                    ],
-                  ),
-                ),
             ],
           ),
         ),
       ),
 
-      // Pulsanti in basso
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -300,7 +250,6 @@ class _EditChatScreenState extends State<EditChatScreen> {
             ),
             const SizedBox(width: 16),
 
-            // Salva Modifiche
             Expanded(
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _updateChat,
@@ -355,7 +304,7 @@ class _EditChatScreenState extends State<EditChatScreen> {
       await _chatRepository.updateChat(widget.chatToEdit.id, updates);
 
       if (mounted) {
-        Navigator.of(context).pop(true); // Ritorna true per indicare che la chat è stata modificata
+        Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Chat modificata con successo!'),
