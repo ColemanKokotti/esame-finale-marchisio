@@ -6,6 +6,7 @@ import '../bloc/auth/auth_event.dart';
 import '../widget/custom_top_bar.dart';
 import '../widget/notification_card.dart';
 import '../screens/notification_screen.dart';
+import '../services/notification_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,18 +16,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<Map<String, String>> notifications = List.generate(5, (index) {
-    return {
-      'sender': 'Risorsa ${index + 1}',
-      'message': [
-        'Consulta la guida rapida per i pulsanti personalizzati.',
-        'Scopri come configurare i bottoni dinamici nei tuoi progetti.',
-        'Leggi l articolo sulle best practices per UI responsive.',
-        'Nuovo aggiornamento: supporto per gesture avanzate!',
-        'Aggiunta documentazione sulle animazioni nei custom button.'
-      ][index],
-    };
-  });
+  final NotificationService _notificationService = NotificationService();
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationService.addListener(_onNotificationsChanged);
+  }
+
+  @override
+  void dispose() {
+    _notificationService.removeListener(_onNotificationsChanged);
+    super.dispose();
+  }
+
+  void _onNotificationsChanged() {
+    setState(() {});
+  }
 
   void _openUrl(String url) async {
     final Uri uri = Uri.parse(url);
@@ -93,6 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final notifications = _notificationService.notifications;
+
     return Scaffold(
       appBar: CustomTopBar(
         showActions: true,
@@ -105,23 +113,49 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          SizedBox(
-            height: 120,
-            child: PageView.builder(
-              itemCount: notifications.length,
-              controller: PageController(viewportFraction: 0.95),
-              itemBuilder: (context, index) {
-                final notif = notifications[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
-                  child: NotificationCard(
-                    sender: notif['sender']!,
-                    message: notif['message']!,
-                  ),
-                );
-              },
+          // Carosello notifiche - mostra solo se ci sono notifiche
+          if (notifications.isNotEmpty)
+            SizedBox(
+              height: 120,
+              child: PageView.builder(
+                itemCount: notifications.length,
+                controller: PageController(viewportFraction: 0.95),
+                itemBuilder: (context, index) {
+                  final notif = notifications[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
+                    child: NotificationCard(
+                      sender: notif['sender']!,
+                      message: notif['message']!,
+                      currentUserProfile: _notificationService.currentUserProfile,
+                      visibleToAll: notif['visibleToAll'] ?? true,
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
+
+          // Messaggio quando non ci sono notifiche
+          if (notifications.isEmpty)
+            Container(
+              height: 60,
+              margin: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: const Center(
+                child: Text(
+                  'Nessuna notifica disponibile',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ),
 
           Expanded(
             child: Padding(

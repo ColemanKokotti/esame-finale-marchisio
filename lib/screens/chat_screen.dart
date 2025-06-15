@@ -5,6 +5,7 @@ import '../models/user_model.dart';
 import '../models/message_model.dart';
 import '../repositories/message_repository.dart';
 import '../repositories/auth_repository.dart';
+import '../services/notification_service.dart'; // AGGIUNTO
 
 class ChatScreen extends StatefulWidget {
   final ChatModel chat;
@@ -23,6 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final MessageRepository _messageRepository = MessageRepository();
   final AuthRepository _authRepository = AuthRepository();
+  final NotificationService _notificationService = NotificationService(); // AGGIUNTO
 
   UserModel? _currentUser;
   Stream<List<MessageModel>>? _messagesStream;
@@ -474,6 +476,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  // METODO AGGIORNATO con notifiche dinamiche
   Future<void> _sendMessage() async {
     final content = _messageController.text.trim();
     if (content.isEmpty || _currentUser == null) return;
@@ -491,6 +494,14 @@ class _ChatScreenState extends State<ChatScreen> {
       );
 
       await _messageRepository.sendMessage(message);
+
+      // AGGIUNTO: Crea notifica dinamica dopo l'invio del messaggio
+      _notificationService.addMessageNotification(
+        _currentUser!.name,
+        content,
+        widget.chat.title,
+      );
+
       _messageController.clear();
 
       // Scroll verso il basso dopo l'invio

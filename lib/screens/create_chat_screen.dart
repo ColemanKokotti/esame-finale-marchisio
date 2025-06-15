@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import '../models/chat_model.dart';
 import '../repositories/chat_repository.dart';
+import '../services/notification_service.dart'; // AGGIUNTO
 
 class CreateChatScreen extends StatefulWidget {
   final String creatorId;
@@ -27,6 +28,7 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final ChatRepository _chatRepository = ChatRepository();
+  final NotificationService _notificationService = NotificationService(); // AGGIUNTO
 
   List<String> _selectedRoles = [];
   bool _isLoading = false;
@@ -356,9 +358,11 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
     setState(() => _isLoading = true);
 
     try {
+      final chatTitle = _titleController.text.trim(); // Ottieni il titolo dinamicamente
+
       final chat = ChatModel(
         id: '', // Verrà generato da Firebase
-        title: _titleController.text.trim(),
+        title: chatTitle,
         description: _descriptionController.text.trim(),
         creatorId: widget.creatorId,
         creatorName: widget.creatorName,
@@ -370,6 +374,12 @@ class _CreateChatScreenState extends State<CreateChatScreen> {
       );
 
       await _chatRepository.createChat(chat);
+
+      // AGGIUNTO: Crea notifica dinamica con il nome della chat inserito dall'utente
+      _notificationService.addChatCreatedNotification(
+        chatTitle, // Usa il titolo inserito dall'utente
+        widget.creatorName,
+      );
 
       if (mounted) {
         Navigator.of(context).pop();
