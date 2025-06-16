@@ -18,18 +18,14 @@ class NotificationCard extends StatelessWidget {
     this.visibleToAll = true,
   }) : super(key: key);
 
-  // Metodo per determinare se la notifica deve essere visibile
   bool get shouldShowNotification {
-    // Se la notifica è visibile a tutti, mostrala sempre
     if (visibleToAll) return true;
 
-    // Se non è visibile a tutti, mostrala solo se l'utente corrente non è Davide Marchisio
     return currentUserProfile != 'Davide Marchisio';
   }
 
   @override
   Widget build(BuildContext context) {
-    // Se la notifica non deve essere mostrata, restituisce un widget vuoto
     if (!shouldShowNotification) {
       return const SizedBox.shrink();
     }
@@ -54,7 +50,6 @@ class NotificationCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Icona personalizzata in base al mittente
               Icon(
                 _getIconForSender(sender),
                 color: _getColorForSender(sender),
@@ -99,7 +94,6 @@ class NotificationCard extends StatelessWidget {
     );
   }
 
-  // Metodo per ottenere l'icona appropriata in base al mittente
   IconData _getIconForSender(String sender) {
     if (sender.toLowerCase() == 'staff') {
       return Icons.admin_panel_settings;
@@ -110,14 +104,13 @@ class NotificationCard extends StatelessWidget {
     }
   }
 
-  // Metodo per ottenere il colore appropriato in base al mittente
   Color _getColorForSender(String sender) {
     if (sender.toLowerCase() == 'staff') {
-      return const Color(0xFF009E3D); // Verde per lo staff
+      return const Color(0xFF009E3D);
     } else if (sender.toLowerCase().contains('davide')) {
-      return Colors.blue; // Blu per Davide Marchisio
+      return Colors.blue;
     } else {
-      return const Color(0xFF009E3D); // Verde di default
+      return const Color(0xFF009E3D);
     }
   }
 }

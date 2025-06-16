@@ -4,14 +4,14 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showActions;
   final VoidCallback? onLogout;
   final VoidCallback? onNotification;
-  final List<Widget>? actions; // NUOVO: Lista di azioni personalizzate
+  final List<Widget>? actions;
 
   const CustomTopBar({
     super.key,
     this.showActions = false,
     this.onLogout,
     this.onNotification,
-    this.actions, // NUOVO parametro
+    this.actions,
   });
 
   @override
@@ -22,7 +22,6 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Lato sinistro - Logout o spazio vuoto
           showActions
               ? GestureDetector(
             onTap: onLogout,
@@ -42,7 +41,6 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
             color: Colors.white,
           ),
 
-          // Lato destro - Azioni personalizzate o notifiche o spazio vuoto
           _buildRightSide(context),
         ],
       ),
@@ -50,7 +48,6 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildRightSide(BuildContext context) {
-    // Se ci sono azioni personalizzate, le mostra
     if (actions != null && actions!.isNotEmpty) {
       return Row(
         mainAxisSize: MainAxisSize.min,
@@ -58,7 +55,6 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
       );
     }
 
-    // Altrimenti mostra le azioni standard se richieste
     if (showActions) {
       return Builder(
         builder: (context) => GestureDetector(
@@ -78,7 +74,6 @@ class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
       );
     }
 
-    // Spazio vuoto se non ci sono azioni
     return const SizedBox(width: 24);
   }
 
